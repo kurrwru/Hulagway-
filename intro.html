@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Photo Booth</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:ital,wght@0,900;1,400&family=Caveat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <main class="landing" id="landing">
+      <div class="page-corner top-left"></div>
+      <div class="page-corner top-right"></div>
+      <div class="page-corner bottom-left"></div>
+      <div class="page-corner bottom-right"></div>
+
+      <p class="tagline">step inside &amp; strike a pose</p>
+
+      <section class="cabinet-scene">
+        <div class="cabinet" id="cabinet">
+          <!-- Photo booth sign -->
+          <div class="sign">
+            <div class="sign-rail"></div>
+
+            <div class="sign-tiles">
+              <span>P</span>
+              <span>H</span>
+              <span>O</span>
+              <span>T</span>
+              <span>O</span>
+              <span>B</span>
+              <span>O</span>
+              <span>O</span>
+              <span>T</span>
+              <span>H</span>
+            </div>
+
+            <div class="sign-rail"></div>
+          </div>
+
+          <!-- Main cabinet -->
+          <div class="cabinet-body">
+            <p class="cabinet-sub">
+              Take Your Own · 4 Different Poses
+            </p>
+
+            <!-- Curtain entrance -->
+            <div class="entrance-frame">
+              <div class="pelmet">
+                <span></span>
+                <span></span>
+              </div>
+
+              <div class="entrance" id="entrance">
+                <div class="interior">
+                  <div class="interior-glow"></div>
+
+                  <div class="aperture">
+                    <div class="aperture-ring">
+                      <div class="aperture-dot"></div>
+                    </div>
+                  </div>
+
+                  <p class="interior-cta">step inside</p>
+                </div>
+
+                <div class="curtain curtain-left"></div>
+                <div class="curtain curtain-right"></div>
+                <div class="curtain-rod"></div>
+              </div>
+            </div>
+
+            <!-- Bottom cabinet section -->
+            <div class="cabinet-bottom">
+              <div class="placard">
+                <div class="placard-sub">
+                  Ready immediately for download
+                </div>
+
+                <div class="placard-main">
+                  <em>Forever memories made here</em>
+                </div>
+              </div>
+
+              <!-- Insert coin button -->
+              <button
+                class="coin-zone"
+                id="coinZone"
+                type="button"
+                aria-label="Insert coin"
+              >
+                <div class="coin-slot-wrap">
+                  <div class="coin-slot-housing">
+                    <div class="coin-slot"></div>
+                  </div>
+
+                  <div class="coin-drop" id="coinDrop"></div>
+
+                  <div class="coin-label">
+                    INSERT<br />
+                    COIN
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cabinet 3D sides -->
+          <div class="face-right"></div>
+          <div class="face-bottom"></div>
+        </div>
+
+        <div class="cabinet-shadow"></div>
+
+        <!-- Start arrow -->
+        <div class="start-here">
+          <span>start here</span>
+          <div class="arrow">↙</div>
+        </div>
+      </section>
+
+      <p class="hover-hint">
+        <span class="hint-arrow">↑</span>
+        <span class="desktop-hint">
+          hover the coin slot to peek inside
+        </span>
+        <span class="mobile-hint">
+          tap the coin slot to start
+        </span>
+      </p>
+    </main>
+
+    <!-- Custom coin cursor -->
+    <div class="coin-cursor" id="coinCursor" aria-hidden="true">
+      <span>¢</span>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
