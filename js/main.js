@@ -39,10 +39,10 @@ const FONTS = {
 
 const FRAMES = [
     { id: "none", name: "Plain", src: "" },
-    { id: "hearts", name: "Hearts", src: "D:\hulagway 4\designs\hearts.svg" },
-    { id: "bows", name: "Bows", src: "D:\hulagway 4\designs\bows.svg" },
-    { id: "floral", name: "Floral", src: "D:\hulagway 4\designs\floral.svg" },
-    { id: "film", name: "Film", src: "D:\hulagway 4\designs\film.svg" }
+    { id: "hearts", name: "Hearts", src: "designs/hearts.svg" },
+    { id: "bows", name: "Bows", src: "designs/bows.svg" },
+    { id: "floral", name: "Floral", src: "designs/floral.svg" },
+    { id: "film", name: "Film", src: "designs/film.svg" }
 ];
 
 const MAX_CAPTION = 20;
