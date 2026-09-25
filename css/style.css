@@ -268,13 +268,14 @@ h1 {
 
 #photoFrame.grid,
 .preview-frame.grid {
-    width: 344px;
+    width: 352px;
     grid-template-columns: 1fr 1fr;
 }
 
 #photoFrame.polaroid,
 .preview-frame.polaroid {
-    width: 320px;
+    width: 316px;
+    padding: 18px 18px 6px;
     grid-template-columns: 1fr;
 }
 
@@ -348,8 +349,52 @@ body > #countdown {
     font-size: 16px;
 }
 
+.grid .caption-space {
+    min-height: 48px;
+}
+
 .polaroid .caption-space {
     min-height: 72px;
+}
+
+.trash-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 5;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(61, 44, 50, 0.55);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.photo-slot:hover .trash-btn,
+.trash-btn:focus-visible {
+    opacity: 0.75;
+}
+
+.trash-btn:hover {
+    opacity: 1;
+    background: rgba(196, 92, 116, 0.92);
+}
+
+@media (hover: none) {
+    .trash-btn {
+        opacity: 0.75;
+    }
+}
+
+#photoFrame.busy .trash-btn {
+    display: none;
 }
 
 .slot-msg {
@@ -445,6 +490,11 @@ legend {
     border: 0;
     cursor: pointer;
     box-shadow: 0 0 0 1px rgba(61, 44, 50, 0.08);
+}
+
+.swatch:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
 }
 
 .swatch.active {
