@@ -56,6 +56,16 @@ button {
   overflow: hidden;
 }
 
+/* Everything around the booth fades away while we zoom in. */
+.landing.zooming .tagline,
+.landing.zooming .page-corner,
+.landing.zooming .cabinet-shadow,
+.landing.zooming .start-here,
+.landing.zooming .hover-hint {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
 .tagline {
   margin-bottom: 14px;
   color: #1a1410;
@@ -113,10 +123,10 @@ button {
 }
 
 .cabinet {
-  width: 340px;
+  width: 450px;
   position: relative;
-  transform: rotateY(-5deg) rotateX(2deg);
-  transform-origin: 50% 47%;
+  transform: translate(0px, 0px) rotateY(-5deg) rotateX(2deg) scale(1);
+  /* transform-origin is set in js/script.js */
   transform-style: preserve-3d;
 
   box-shadow:
@@ -126,8 +136,10 @@ button {
   transition: transform 1.8s cubic-bezier(0.4, 0, 0.6, 1);
 }
 
+/* The zoom itself (translate + scale) is set in js/script.js,
+   so the page inside the entrance ends up exactly full screen. */
 .cabinet.zoom {
-  transform: rotateY(0deg) rotateX(0deg) scale(9);
+  transition: transform 3.2s cubic-bezier(0.5, 0, 0.25, 1);
 }
 
 .sign {
@@ -236,76 +248,20 @@ button {
 .interior {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-
-  background:
-    radial-gradient(
-      ellipse at 50% 60%,
-      #1e0806 0%,
-      #0d0303 45%,
-      #020101 100%
-    );
+  overflow: hidden;
+  background: #f3ebe4;
 }
 
-.interior-glow {
+/* The real page is laid out at full-screen size (set in js/script.js)
+   and shrunk to fit inside the entrance. */
+.page-preview {
   position: absolute;
-  inset: 0;
-
-  background: radial-gradient(
-    ellipse at 50% 60%,
-    rgba(200, 80, 20, 0.18),
-    transparent 65%
-  );
-
-  animation: glowPulse 4s ease-in-out infinite;
-}
-
-.aperture {
-  width: 64px;
-  height: 64px;
-  position: relative;
-  z-index: 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1.5px solid rgba(237, 232, 220, 0.13);
-  border-radius: 50%;
-
-  animation: breathe 3.5s ease-in-out infinite;
-}
-
-.aperture-ring {
-  width: 42px;
-  height: 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 1px solid rgba(237, 232, 220, 0.11);
-  border-radius: 50%;
-}
-
-.aperture-dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: rgba(237, 232, 220, 0.07);
-}
-
-.interior-cta {
-  position: relative;
-  z-index: 1;
-  color: rgba(237, 232, 220, 0.45);
-  font-size: 0.6rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
+  top: 50%;
+  left: 50%;
+  border: 0;
+  background: #f3ebe4;
+  pointer-events: none;
+  transform-origin: center center;
 }
 
 /* Curtains */
@@ -365,6 +321,11 @@ button {
   z-index: 3;
   height: 7px;
   background: #150f0c;
+}
+
+.curtains-open .curtain-rod {
+  opacity: 0;
+  transition: opacity 0.8s ease 0.3s;
 }
 
 /* Cabinet bottom */
@@ -631,28 +592,6 @@ button {
   100% {
     opacity: 0;
     transform: translateX(-50%) translateY(28px) scale(0.3);
-  }
-}
-
-@keyframes glowPulse {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 rgba(237, 232, 220, 0.03);
-  }
-
-  50% {
-    box-shadow: 0 0 22px 5px rgba(237, 232, 220, 0.08);
   }
 }
 
