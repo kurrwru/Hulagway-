@@ -1,5 +1,6 @@
 /* Hulagway Solo Mode
-   Add custom PNG/SVG frames in /designs and list them in FRAMES below. */
+   Patterns: each layout has its own 5 patterns (see PATTERNS below).
+   To use your own artwork, save a PNG in assets/patterns/<layout>/<pattern id>.png */
 
 const LAYOUTS = {
     classic: { id: "classic", name: "Classic Strip", count: 4, columns: 1, rows: 4, slotW: 260, slotH: 174, gap: 12, pad: 20, captionH: 52 },
@@ -19,7 +20,38 @@ const SWATCHES = [
     { id: "gray", name: "Soft Gray", hex: "#d9d4d1" }
 ];
 
-const PATTERNS = ["none", "hearts", "stars", "flowers", "polka", "checker", "clouds", "bows", "sparkles", "doodles", "stripes"];
+/* Patterns are full background pictures drawn BEHIND the photos.
+   While a pattern is chosen, the background color is ignored.
+   Your own PNG for a pattern goes in:  assets/patterns/<layout>/<id>.png
+   (example: assets/patterns/classic/hearts.png)
+   If that PNG does not exist yet, a simple built-in design is drawn instead.
+   bg / ink = colors of the built-in design.  text = caption color on that pattern. */
+const PATTERN_DIR = "assets/patterns";
+
+const MOTIF_PATTERNS = [
+    { id: "hearts", name: "Hearts", bg: "#f9d5e0", ink: "#e58aa6", text: "#3d2c32" },
+    { id: "polka", name: "Polka Dots", bg: "#cfe3f5", ink: "#ffffff", text: "#3d2c32" },
+    { id: "checker", name: "Checkered", bg: "#ffffff", ink: "#f4c7d4", text: "#3d2c32" },
+    { id: "flowers", name: "Flowers", bg: "#e3f1e0", ink: "#f7b3c6", text: "#3d2c32" },
+    { id: "bows", name: "Bows", bg: "#e6dcf3", ink: "#d9799a", text: "#3d2c32" }
+];
+
+const FILM_PATTERNS = [
+    { id: "film-1", name: "Black Reel", bg: "#1f1719", ink: "#f3ebe4", text: "#f3ebe4" },
+    { id: "film-2", name: "Pink Reel", bg: "#f4c7d4", ink: "#ffffff", text: "#3d2c32" },
+    { id: "film-3", name: "Cream Reel", bg: "#f4ead6", ink: "#3d2c32", text: "#3d2c32" },
+    { id: "film-4", name: "Blue Reel", bg: "#c9def0", ink: "#ffffff", text: "#3d2c32" },
+    { id: "film-5", name: "Sepia Reel", bg: "#5a4038", ink: "#e7d3b8", text: "#f3e6d2" }
+];
+
+const PATTERNS = {
+    classic: MOTIF_PATTERNS,
+    grid: MOTIF_PATTERNS,
+    polaroid: MOTIF_PATTERNS,
+    film: FILM_PATTERNS
+};
+
+const DEFAULT_TEXT_COLOR = "#3d2c32";
 
 const FILTERS = {
     original: { name: "Original", css: "none" },
@@ -36,14 +68,6 @@ const FONTS = {
     typewriter: { name: "Typewriter", css: '"Special Elite", "Courier New", monospace', weight: "500", size: 18 },
     bold: { name: "Bold", css: '"Nunito", system-ui, sans-serif', weight: "700", size: 20 }
 };
-
-const FRAMES = [
-    { id: "none", name: "Plain", src: "" },
-    { id: "hearts", name: "Hearts", src: "designs/hearts.svg" },
-    { id: "bows", name: "Bows", src: "designs/bows.svg" },
-    { id: "floral", name: "Floral", src: "designs/floral.svg" },
-    { id: "film", name: "Film", src: "designs/film.svg" }
-];
 
 const MAX_CAPTION = 20;
 const MAX_UPLOAD = 8 * 1024 * 1024;
@@ -69,11 +93,11 @@ let slots = [];
 let countdownRunning = false;
 let cameraStream = null;
 let cameraState = "idle";
+let cameraToken = 0;
 let swatch = "pink";
 let pattern = "none";
 let filter = "original";
 let font = "serif";
-let frameId = "none";
 let caption = "";
 let finalUrl = "";
 
@@ -114,12 +138,6 @@ function buildSlots() {
         const slot = document.createElement("div");
         slot.className = "photo-slot";
         slot.dataset.index = String(i);
-        slot.addEventListener("click", function () {
-            if (photos[i]) {
-                currentPhoto = i;
-                placeCamera();
-            }
-        });
         photoFrame.appendChild(slot);
         slots.push(slot);
     }
@@ -134,25 +152,64 @@ function filledCount() {
 
 function updateProgress() {
     const spec = layout();
+    const full = filledCount() === spec.count;
     document.querySelector("#captureEyebrow").textContent = spec.name;
     document.querySelector("#photoProgress").textContent = filledCount() + " of " + spec.count + " captured";
     document.querySelector("#resetButton").classList.toggle("hidden", filledCount() === 0);
-    document.querySelector("#customizeButton").classList.toggle("hidden", filledCount() !== spec.count);
+    document.querySelector("#customizeButton").classList.toggle("hidden", !full);
+    takePhotoButton.disabled = countdownRunning || full;
+    document.querySelector("#uploadButton").disabled = full;
+}
+
+function setHint(text) {
+    document.querySelector("#captureHint").textContent = text;
+}
+
+const HINT_LIVE = "Press Take photo, Enter, or Space. Hover over a photo to delete it.";
+const HINT_OFF = "The camera is off. Press Take photo to ask for it again, or upload photos instead.";
+const HINT_BLOCKED = "Your browser is blocking the camera. Allow it from the icon in the address bar, then press Take photo again. You can also upload photos instead.";
+
+function makeTrashButton(index) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "trash-btn";
+    btn.setAttribute("aria-label", "Delete photo " + (index + 1));
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+    btn.onclick = function (event) {
+        event.stopPropagation();
+        deletePhoto(index);
+    };
+    return btn;
+}
+
+/* Deletes one photo. The photos after it move back one slot,
+   and the camera goes to the first empty slot. */
+function deletePhoto(index) {
+    if (countdownRunning || !photos[index]) return;
+    photos.splice(index, 1);
+    photos.push(null);
+    currentPhoto = photos.findIndex(function (p) { return !p; });
+    document.querySelector("#captureError").classList.add("hidden");
+    placeCamera();
+    updateProgress();
 }
 
 function placeCamera() {
     slots.forEach(function (slot, i) {
         slot.querySelectorAll(".slot-msg").forEach(function (n) { n.remove(); });
-        const img = slot.querySelector("img");
-        if (photos[i] && i !== currentPhoto) {
+        let img = slot.querySelector("img");
+        let trash = slot.querySelector(".trash-btn");
+        if (photos[i]) {
             if (!img) {
-                const image = document.createElement("img");
-                image.alt = "Photo " + (i + 1);
-                slot.appendChild(image);
+                img = document.createElement("img");
+                img.alt = "Photo " + (i + 1);
+                slot.appendChild(img);
             }
-            slot.querySelector("img").src = photos[i];
-        } else if (img && i !== currentPhoto) {
-            img.remove();
+            if (img.getAttribute("src") !== photos[i]) img.src = photos[i];
+            if (!trash) slot.appendChild(makeTrashButton(i));
+        } else {
+            if (img) img.remove();
+            if (trash) trash.remove();
         }
     });
 
@@ -166,40 +223,72 @@ function placeCamera() {
     slot.appendChild(countdown);
     camera.style.display = cameraState === "live" ? "block" : "none";
 
-    if (cameraState !== "live" && !photos[currentPhoto]) {
+    if (cameraState !== "live") {
         const msg = document.createElement("div");
         msg.className = "slot-msg";
-        msg.textContent = cameraState === "requesting" ? "Waiting for camera…" : "Upload a photo for this slot";
+        msg.textContent = cameraState === "requesting" ? "Waiting for camera…" : "Camera is off. Press Take photo to try again, or upload a photo.";
         slot.appendChild(msg);
     }
 }
 
-function startCamera() {
-    cameraState = "requesting";
-    placeCamera();
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        cameraState = "denied";
-        document.querySelector("#captureHint").textContent = "Camera access was denied. Upload a photo for each slot instead.";
+/* Starts the camera. If the browser already allows it, this just works with no question.
+   If the camera is blocked, it is asked for again only when the person presses Take photo
+   (fromButton = true). */
+async function startCamera(fromButton) {
+    const token = ++cameraToken;
+
+    if (cameraStream && cameraStream.active) {
+        camera.srcObject = cameraStream;
+        cameraState = "live";
+        setHint(HINT_LIVE);
         placeCamera();
         return;
     }
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-        .then(function (stream) {
-            cameraStream = stream;
-            camera.srcObject = stream;
-            camera.play().catch(function () {});
-            cameraState = "live";
-            document.querySelector("#captureHint").textContent = "Press Take photo, Enter, or Space. Click a photo to retake it.";
-            placeCamera();
-        })
-        .catch(function () {
-            cameraState = "denied";
-            document.querySelector("#captureHint").textContent = "Camera access was denied. Upload a photo for each slot instead.";
-            placeCamera();
-        });
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        cameraState = "denied";
+        setHint("This browser cannot use the camera here. Upload photos instead.");
+        placeCamera();
+        return;
+    }
+
+    cameraState = "requesting";
+    placeCamera();
+
+    let permission = "prompt";
+    try {
+        permission = (await navigator.permissions.query({ name: "camera" })).state;
+    } catch (e) {}
+    if (token !== cameraToken) return;
+
+    if (permission === "denied" && !fromButton) {
+        cameraState = "denied";
+        setHint(HINT_OFF);
+        placeCamera();
+        return;
+    }
+
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+        if (token !== cameraToken || capturePage.classList.contains("hidden")) {
+            stream.getTracks().forEach(function (track) { track.stop(); });
+            return;
+        }
+        cameraStream = stream;
+        camera.srcObject = stream;
+        camera.play().catch(function () {});
+        cameraState = "live";
+        setHint(HINT_LIVE);
+    } catch (e) {
+        if (token !== cameraToken) return;
+        cameraState = "denied";
+        setHint(permission === "denied" ? HINT_BLOCKED : HINT_OFF);
+    }
+    placeCamera();
 }
 
 function stopCamera() {
+    cameraToken += 1;
     if (cameraStream) {
         cameraStream.getTracks().forEach(function (track) { track.stop(); });
         cameraStream = null;
@@ -209,18 +298,18 @@ function stopCamera() {
 }
 
 function openCapture(id) {
+    if (id !== selectedLayout) pattern = "none";
     selectedLayout = id;
     const spec = layout();
     photos = Array(spec.count).fill(null);
     currentPhoto = 0;
     countdownRunning = false;
     countdown.textContent = "";
-    takePhotoButton.disabled = false;
     buildSlots();
     updateProgress();
     document.querySelector("#captureError").classList.add("hidden");
     show(capturePage);
-    startCamera();
+    startCamera(false);
 }
 
 function captureFromVideo() {
@@ -240,9 +329,13 @@ function putPhoto(dataUrl) {
         showError("The camera is still starting. Try again in a moment.");
         return;
     }
+    if (currentPhoto < 0) {
+        showError("All the slots are full. Hover over a photo and click the trash icon to delete one.");
+        return;
+    }
+    document.querySelector("#captureError").classList.add("hidden");
     photos[currentPhoto] = dataUrl;
-    const next = photos.findIndex(function (p) { return !p; });
-    currentPhoto = next === -1 ? -1 : next;
+    currentPhoto = photos.findIndex(function (p) { return !p; });
     placeCamera();
     updateProgress();
 }
@@ -254,13 +347,18 @@ function showError(text) {
 }
 
 function startCountdown() {
-    if (countdownRunning) return;
+    if (countdownRunning || cameraState === "requesting") return;
+    if (currentPhoto < 0) {
+        showError("All the slots are full. Hover over a photo and click the trash icon to delete one.");
+        return;
+    }
     if (cameraState !== "live") {
-        fileInput.click();
+        startCamera(true);
         return;
     }
     countdownRunning = true;
-    takePhotoButton.disabled = true;
+    photoFrame.classList.add("busy");
+    updateProgress();
     let number = 3;
     countdown.textContent = String(number);
     const timer = setInterval(function () {
@@ -271,9 +369,10 @@ function startCountdown() {
         }
         clearInterval(timer);
         countdown.textContent = "";
-        putPhoto(captureFromVideo());
         countdownRunning = false;
-        takePhotoButton.disabled = false;
+        photoFrame.classList.remove("busy");
+        if (currentPhoto >= 0) putPhoto(captureFromVideo());
+        updateProgress();
     }, 1000);
 }
 
@@ -320,8 +419,10 @@ document.querySelector("#captureBackButton").onclick = function () {
 takePhotoButton.onclick = startCountdown;
 document.querySelector("#uploadButton").onclick = function () { fileInput.click(); };
 document.querySelector("#resetButton").onclick = function () {
+    if (countdownRunning) return;
     photos = Array(layout().count).fill(null);
     currentPhoto = 0;
+    document.querySelector("#captureError").classList.add("hidden");
     placeCamera();
     updateProgress();
 };
@@ -369,6 +470,7 @@ function openCustomize() {
 
 function renderCustomize() {
     const spec = layout();
+    const usingPattern = currentPattern() !== null;
     const wrap = document.querySelector("#previewWrap");
     wrap.innerHTML = "";
     wrap.appendChild(makePreviewFrame(spec, photos, true));
@@ -381,15 +483,23 @@ function renderCustomize() {
         b.className = "swatch" + (swatch === s.id ? " active" : "");
         b.title = s.name;
         b.style.background = s.hex;
+        b.disabled = usingPattern;
         b.onclick = function () { swatch = s.id; renderCustomize(); };
         swatchRow.appendChild(b);
     });
+    document.querySelector("#bgHint").textContent = usingPattern
+        ? "Background colors are ignored while a pattern is on. Choose Plain to use a color."
+        : "";
 
     const patternRow = document.querySelector("#patternRow");
     patternRow.innerHTML = "";
-    PATTERNS.forEach(function (id) {
-        patternRow.appendChild(chip(id[0].toUpperCase() + id.slice(1), pattern === id, function () {
-            pattern = id;
+    patternRow.appendChild(chip("Plain", !usingPattern, function () {
+        pattern = "none";
+        renderCustomize();
+    }));
+    patternList().forEach(function (p) {
+        patternRow.appendChild(chip(p.name, pattern === p.id, function () {
+            pattern = p.id;
             renderCustomize();
         }));
     });
@@ -399,15 +509,6 @@ function renderCustomize() {
     Object.keys(FILTERS).forEach(function (id) {
         filterRow.appendChild(chip(FILTERS[id].name, filter === id, function () {
             filter = id;
-            renderCustomize();
-        }));
-    });
-
-    const frameRow = document.querySelector("#frameRow");
-    frameRow.innerHTML = "";
-    FRAMES.forEach(function (f) {
-        frameRow.appendChild(chip(f.name, frameId === f.id, function () {
-            frameId = f.id;
             renderCustomize();
         }));
     });
@@ -439,8 +540,9 @@ document.querySelector("#captionInput").addEventListener("input", function (even
 function makePreviewFrame(spec, shotList, liveCss) {
     const frame = document.createElement("div");
     frame.className = "preview-frame " + spec.id;
-    const hex = SWATCHES.find(function (s) { return s.id === swatch; }).hex;
-    frame.style.background = hex;
+    const pat = currentPattern();
+    frame.style.backgroundColor = pat ? pat.bg : swatchHex();
+    paintPreviewBackground(frame, spec);
     for (let i = 0; i < spec.count; i++) {
         const slot = document.createElement("div");
         slot.className = "photo-slot";
@@ -459,56 +561,179 @@ function makePreviewFrame(spec, shotList, liveCss) {
     cap.style.fontFamily = FONTS[font].css;
     cap.style.fontWeight = FONTS[font].weight;
     cap.style.fontSize = FONTS[font].size + "px";
+    cap.style.color = captionColor();
     frame.appendChild(cap);
     return frame;
 }
 
-function paintPattern(ctx, id, width, height) {
-    if (id === "none") return;
-    ctx.fillStyle = "rgba(61,44,50,0.1)";
-    ctx.strokeStyle = "rgba(61,44,50,0.1)";
-    if (id === "checker") {
-        for (let y = 0; y < height; y += 18) {
-            for (let x = 0; x < width; x += 18) {
-                if (((x / 18) + (y / 18)) % 2 === 0) ctx.fillRect(x, y, 18, 18);
-            }
+/* ---------- Pattern helpers ---------- */
+
+function patternList() {
+    return PATTERNS[selectedLayout] || [];
+}
+
+/* Returns the chosen pattern for the current layout, or null for Plain. */
+function currentPattern() {
+    return patternList().find(function (p) { return p.id === pattern; }) || null;
+}
+
+function swatchHex() {
+    return SWATCHES.find(function (s) { return s.id === swatch; }).hex;
+}
+
+function captionColor() {
+    const pat = currentPattern();
+    return pat ? pat.text : DEFAULT_TEXT_COLOR;
+}
+
+/* Points on a grid whose first/last rows and columns sit in the middle of the outer margin. */
+function gridPoints(w, h, target) {
+    const cols = Math.max(2, Math.round((w - 20) / target) + 1);
+    const rows = Math.max(2, Math.round((h - 20) / target) + 1);
+    const points = [];
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            points.push([10 + c * (w - 20) / (cols - 1), 10 + r * (h - 20) / (rows - 1)]);
         }
-        return;
     }
-    if (id === "stripes") {
-        ctx.save();
-        ctx.translate(width / 2, height / 2);
-        ctx.rotate(-Math.PI / 8);
-        for (let x = -width; x < width; x += 16) ctx.fillRect(x, -height, 7, height * 2);
-        ctx.restore();
-        return;
+    return points;
+}
+
+function drawHeart(ctx, x, y, s) {
+    ctx.beginPath();
+    ctx.moveTo(x, y + s * 0.9);
+    ctx.bezierCurveTo(x - s * 1.4, y - s * 0.1, x - s * 0.6, y - s * 1.1, x, y - s * 0.35);
+    ctx.bezierCurveTo(x + s * 0.6, y - s * 1.1, x + s * 1.4, y - s * 0.1, x, y + s * 0.9);
+    ctx.fill();
+}
+
+function drawFlower(ctx, x, y, s) {
+    for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(a) * s * 0.6, y + Math.sin(a) * s * 0.6, s * 0.45, 0, Math.PI * 2);
+        ctx.fill();
     }
-    if (id === "polka") {
-        for (let y = 10; y < height; y += 28) {
-            for (let x = 10; x < width; x += 28) {
-                ctx.beginPath();
-                ctx.arc(x, y, 3.2, 0, Math.PI * 2);
-                ctx.fill();
-            }
+    ctx.save();
+    ctx.fillStyle = "#f6d365";
+    ctx.beginPath();
+    ctx.arc(x, y, s * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawBow(ctx, x, y, s) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x - s * 1.1, y - s * 0.7);
+    ctx.lineTo(x - s * 1.1, y + s * 0.7);
+    ctx.closePath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + s * 1.1, y - s * 0.7);
+    ctx.lineTo(x + s * 1.1, y + s * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, s * 0.32, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawCheckers(ctx, w, h) {
+    const cols = Math.max(2, Math.round(w / 12));
+    const size = w / cols;
+    const rows = Math.max(2, Math.round(h / size));
+    const sizeY = h / rows;
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if ((r + c) % 2 === 0) ctx.fillRect(c * size, r * sizeY, size, sizeY);
         }
-        return;
     }
-    const step = 36;
-    for (let y = 14; y < height; y += step) {
-        for (let x = 14; x < width; x += step) {
+}
+
+function drawSprockets(ctx, w, h) {
+    for (let y = 8; y + 12 <= h - 6; y += 22) {
+        [6, w - 14].forEach(function (x) {
             ctx.beginPath();
-            if (id === "stars" || id === "sparkles") {
-                ctx.moveTo(x, y - 5);
-                ctx.lineTo(x, y + 5);
-                ctx.moveTo(x - 5, y);
-                ctx.lineTo(x + 5, y);
-                ctx.stroke();
-            } else {
-                ctx.arc(x, y, id === "hearts" ? 4 : 5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+            if (ctx.roundRect) ctx.roundRect(x, y, 8, 12, 2);
+            else ctx.rect(x, y, 8, 12);
+            ctx.fill();
+        });
     }
+}
+
+/* Built-in design, used until you add your own PNG for that pattern. */
+function drawBuiltInPattern(ctx, spec, pat, w, h) {
+    ctx.fillStyle = pat.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = pat.ink;
+    /* keep the caption area clear so the text stays readable */
+    const captionTop = spec.pad + spec.rows * spec.slotH + (spec.rows - 1) * spec.gap;
+    function points(target) {
+        return gridPoints(w, h, target).filter(function (p) {
+            const inCaption = p[1] > captionTop - 4 && p[1] < captionTop + spec.captionH + 4;
+            const inMargin = p[0] < spec.pad || p[0] > w - spec.pad;
+            return !inCaption || inMargin;
+        });
+    }
+    if (pat.id === "checker") {
+        drawCheckers(ctx, w, h);
+    } else if (pat.id === "polka") {
+        points(20).forEach(function (p) {
+            ctx.beginPath();
+            ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    } else if (pat.id === "hearts") {
+        points(24).forEach(function (p) { drawHeart(ctx, p[0], p[1], 6); });
+    } else if (pat.id === "flowers") {
+        points(26).forEach(function (p) { drawFlower(ctx, p[0], p[1], 7); });
+    } else if (pat.id === "bows") {
+        points(26).forEach(function (p) { drawBow(ctx, p[0], p[1], 6); });
+    } else if (pat.id.indexOf("film") === 0) {
+        drawSprockets(ctx, w, h);
+    }
+}
+
+const patternImages = {};
+
+/* Loads a pattern PNG once. Resolves to null if the file does not exist. */
+function loadPatternImage(src) {
+    if (!(src in patternImages)) {
+        patternImages[src] = loadImage(src).catch(function () { return null; });
+    }
+    return patternImages[src];
+}
+
+/* Paints the background: the pattern if one is chosen, otherwise the plain color. */
+async function paintBackground(ctx, spec, w, h) {
+    const pat = currentPattern();
+    if (!pat) {
+        ctx.fillStyle = swatchHex();
+        ctx.fillRect(0, 0, w, h);
+        return;
+    }
+    const img = await loadPatternImage(PATTERN_DIR + "/" + spec.id + "/" + pat.id + ".png");
+    if (img) {
+        ctx.drawImage(img, 0, 0, w, h);
+    } else {
+        drawBuiltInPattern(ctx, spec, pat, w, h);
+    }
+}
+
+/* Puts the same background used for the download behind the live preview. */
+async function paintPreviewBackground(frame, spec) {
+    const size = frameSize(spec);
+    const canvas = document.createElement("canvas");
+    canvas.width = size.width * 2;
+    canvas.height = size.height * 2;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(2, 2);
+    try {
+        await paintBackground(ctx, spec, size.width, size.height);
+        if (!frame.isConnected) return;
+        frame.style.backgroundImage = "url(" + canvas.toDataURL("image/png") + ")";
+        frame.style.backgroundSize = "100% 100%";
+    } catch (e) {}
 }
 
 function loadImage(src) {
@@ -548,10 +773,7 @@ async function composeBooth() {
     canvas.height = Math.round(size.height * EXPORT_SCALE);
     const ctx = canvas.getContext("2d");
     ctx.scale(EXPORT_SCALE, EXPORT_SCALE);
-    const hex = SWATCHES.find(function (s) { return s.id === swatch; }).hex;
-    ctx.fillStyle = hex;
-    ctx.fillRect(0, 0, size.width, size.height);
-    paintPattern(ctx, pattern, size.width, size.height);
+    await paintBackground(ctx, spec, size.width, size.height);
 
     const images = await Promise.all(photos.filter(Boolean).map(loadImage));
     images.forEach(function (img, i) {
@@ -565,7 +787,7 @@ async function composeBooth() {
     if (caption.trim()) {
         await document.fonts.ready;
         const f = FONTS[font];
-        ctx.fillStyle = "#3d2c32";
+        ctx.fillStyle = captionColor();
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = f.weight + " " + f.size + "px " + f.css;
@@ -573,13 +795,6 @@ async function composeBooth() {
         ctx.fillText(caption.trim(), size.width / 2, captionY + spec.captionH / 2, size.width - spec.pad * 2);
     }
 
-    const chosen = FRAMES.find(function (f) { return f.id === frameId; });
-    if (chosen && chosen.src) {
-        try {
-            const overlay = await loadImage(chosen.src);
-            ctx.drawImage(overlay, 0, 0, size.width, size.height);
-        } catch (e) {}
-    }
     return canvas;
 }
 
