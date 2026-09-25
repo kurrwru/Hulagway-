@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Photo Booth</title>
+    <title>Hulagway</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -61,15 +62,15 @@
 
               <div class="entrance" id="entrance">
                 <div class="interior">
-                  <div class="interior-glow"></div>
-
-                  <div class="aperture">
-                    <div class="aperture-ring">
-                      <div class="aperture-dot"></div>
-                    </div>
-                  </div>
-
-                  <p class="interior-cta">step inside</p>
+                  <!-- The real Hulagway page. It is shown when the curtains open. -->
+                  <iframe
+                    class="page-preview"
+                    id="pagePreview"
+                    src="booth.html"
+                    title=""
+                    tabindex="-1"
+                    aria-hidden="true"
+                  ></iframe>
                 </div>
 
                 <div class="curtain curtain-left"></div>
