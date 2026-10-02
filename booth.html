@@ -13,6 +13,38 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Pastel lily backdrop: decorative layer for the photobooth pages. -->
+    <div id="hulagwayBackdrop" aria-hidden="true">
+        <div class="backdrop-checker"></div>
+        <div class="backdrop-glow backdrop-glow--one"></div>
+        <div class="backdrop-glow backdrop-glow--two"></div>
+
+        <div class="backdrop-brand">HULAGWAY</div>
+
+        <div class="backdrop-copy backdrop-copy--left">little moments,<br>made to keep.</div>
+        <div class="backdrop-copy backdrop-copy--right">click and move<br>to reveal a little magic.</div>
+
+        <div class="backdrop-word backdrop-word--photo">PHOTOBOOTH</div>
+
+        <div class="backdrop-flower backdrop-flower--left" data-flower="left">
+            <div class="backdrop-flower__layer backdrop-flower__layer--front">
+                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="">
+            </div>
+            <div class="backdrop-flower__layer backdrop-flower__layer--reveal">
+                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_151324_bf318a5f-5525-4fc7-aab5-e9a341018828.png&w=1280&q=85" alt="">
+            </div>
+        </div>
+
+        <div class="backdrop-flower backdrop-flower--right" data-flower="right">
+            <div class="backdrop-flower__layer backdrop-flower__layer--front">
+                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="">
+            </div>
+            <div class="backdrop-flower__layer backdrop-flower__layer--reveal">
+                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_151324_bf318a5f-5525-4fc7-aab5-e9a341018828.png&w=1280&q=85" alt="">
+            </div>
+        </div>
+    </div>
+
     <div id="homePage" class="page">
         <p class="eyebrow">Solo mode</p>
         <h1>Hulagway</h1>
@@ -157,6 +189,7 @@
         <button type="button" class="btn ghost info-back">Back to Hulagway</button>
     </div>
 
+    <script src="js/background.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
