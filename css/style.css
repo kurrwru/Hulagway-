@@ -550,3 +550,332 @@ legend {
         transform: none !important;
     }
 }
+
+/* =========================================================
+   PASTEL HULAGWAY BACKDROP
+   The cabinet intro (index.html) is intentionally untouched.
+   This fixed layer sits behind every screen in booth.html.
+========================================================= */
+
+body {
+    background: #f8e4ee;
+}
+
+#hulagwayBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 18% 19%, rgba(255, 255, 255, 0.76) 0, rgba(255,255,255,0.26) 23%, transparent 43%),
+        radial-gradient(circle at 86% 72%, rgba(232, 203, 224, 0.30) 0, transparent 36%),
+        linear-gradient(135deg, #fbf0f5 0%, #f7dce9 51%, #f3e2f0 100%);
+}
+
+/* Very soft pink / lavender checker, intentionally low-contrast. */
+.backdrop-checker {
+    position: absolute;
+    inset: 0;
+    opacity: 0.25;
+    background-image: repeating-conic-gradient(
+        rgba(221, 190, 213, 0.24) 0deg 90deg,
+        rgba(255, 255, 255, 0.18) 90deg 180deg
+    );
+    background-size: 44px 44px;
+    mix-blend-mode: multiply;
+}
+
+.backdrop-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(24px);
+    pointer-events: none;
+}
+
+.backdrop-glow--one {
+    width: 34vw;
+    height: 34vw;
+    max-width: 620px;
+    max-height: 620px;
+    top: -18vw;
+    right: -5vw;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.backdrop-glow--two {
+    width: 32vw;
+    height: 32vw;
+    max-width: 560px;
+    max-height: 560px;
+    bottom: -18vw;
+    left: -8vw;
+    background: rgba(221, 180, 212, 0.22);
+}
+
+.backdrop-brand,
+.backdrop-word {
+    position: absolute;
+    z-index: 1;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 16vw, 13rem);
+    font-weight: 500;
+    line-height: 0.78;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.backdrop-brand {
+    top: 7vh;
+    left: 3.2vw;
+    color: rgba(177, 105, 132, 0.13);
+}
+
+/* Same font-size + typeface as HULAGWAY, but anchored to the right. */
+.backdrop-word--photo {
+    right: 2.6vw;
+    bottom: -1.5vh;
+    color: rgba(177, 105, 132, 0.13);
+}
+
+.backdrop-copy {
+    position: absolute;
+    z-index: 4;
+    bottom: 4.2vh;
+    color: rgba(126, 86, 99, 0.44);
+    font-size: clamp(12px, 1vw, 17px);
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
+}
+
+.backdrop-copy--left {
+    left: 3.2vw;
+}
+
+.backdrop-copy--right {
+    right: 3.2vw;
+    text-align: right;
+}
+
+.backdrop-flower {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.backdrop-flower--right {
+    top: 4.8vh;
+    right: -1vw;
+    width: min(56vw, 900px);
+    height: 104dvh;
+}
+
+.backdrop-flower--left {
+    top: 22vh;
+    left: -2vw;
+    width: min(29vw, 450px);
+    height: 79dvh;
+}
+
+.backdrop-flower__layer {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+.backdrop-flower__layer img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* Mirroring only the left flower keeps the same artwork while making it face inward. */
+.backdrop-flower--left .backdrop-flower__layer {
+    transform: scaleX(-1);
+}
+
+.backdrop-flower__layer--front {
+    opacity: 0.96;
+    -webkit-mask-image: linear-gradient(#fff, #fff);
+    mask-image: linear-gradient(#fff, #fff);
+}
+
+.backdrop-flower__layer--reveal {
+    opacity: 0.98;
+    -webkit-mask-image: linear-gradient(#0000, #0000);
+    mask-image: linear-gradient(#0000, #0000);
+}
+
+/* Keep the actual Hulagway interface above the decorative art. */
+.page {
+    position: relative;
+    z-index: 10;
+}
+
+@media (max-width: 1200px), (max-aspect-ratio: 4 / 5) {
+    .backdrop-brand {
+        top: 5.5vh;
+        left: 2.7vw;
+        font-size: clamp(3.5rem, 16vw, 8rem);
+    }
+
+    .backdrop-word--photo {
+        font-size: clamp(3.5rem, 16vw, 8rem);
+        right: 1.8vw;
+        bottom: -0.7vh;
+    }
+
+    .backdrop-flower--right {
+        top: 9vh;
+        right: -5vw;
+        width: 73vw;
+        height: 75dvh;
+    }
+
+    .backdrop-flower--left {
+        top: 30vh;
+        left: -8vw;
+        width: 38vw;
+        height: 58dvh;
+    }
+}
+
+@media (max-width: 700px) {
+    .backdrop-brand {
+        top: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(3rem, 16vw, 5.5rem);
+    }
+
+    .backdrop-word--photo {
+        right: 2vw;
+        bottom: 1vh;
+        font-size: clamp(2.65rem, 15vw, 5rem);
+    }
+
+    .backdrop-flower--right {
+        top: 16vh;
+        right: -16vw;
+        width: 96vw;
+        height: 56dvh;
+    }
+
+    .backdrop-flower--left {
+        top: 39vh;
+        left: -17vw;
+        width: 52vw;
+        height: 40dvh;
+    }
+
+    .backdrop-copy {
+        display: none;
+    }
+
+    .backdrop-checker {
+        background-size: 30px 30px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .backdrop-flower__layer--reveal {
+        opacity: 0;
+    }
+}
+
+
+/* Responsive lily placement and spacing fixes */
+#hulagwayBackdrop .backdrop-flower--left {
+    top: auto;
+    bottom: 0;
+    left: 0.10cm;
+    right: auto;
+    width: min(40vw, 620px);
+    height: 100dvh;
+}
+
+#hulagwayBackdrop .backdrop-flower--right {
+    top: auto;
+    bottom: 0;
+    right: 0.10cm;
+    left: auto;
+    width: min(40vw, 620px);
+    height: 100dvh;
+}
+
+#hulagwayBackdrop .backdrop-word--photo {
+    bottom: 0.5in;
+}
+
+@media (max-width: 1200px), (max-aspect-ratio: 4 / 5) {
+    #hulagwayBackdrop .backdrop-flower--left {
+        top: auto;
+        bottom: 0;
+        left: 0.10cm;
+        width: min(43vw, 520px);
+        height: 78dvh;
+    }
+
+    #hulagwayBackdrop .backdrop-flower--right {
+        top: auto;
+        bottom: 0;
+        right: 0.10cm;
+        width: min(58vw, 700px);
+        height: 100dvh;
+    }
+
+    #hulagwayBackdrop .backdrop-word--photo {
+        bottom: 0.5in;
+    }
+}
+
+@media (max-width: 700px) {
+    #hulagwayBackdrop .backdrop-flower--left {
+        top: auto;
+        bottom: 0;
+        left: 0.10cm;
+        width: 48vw;
+        height: 58dvh;
+    }
+
+    #hulagwayBackdrop .backdrop-flower--right {
+        top: auto;
+        bottom: 0;
+        right: 0.10cm;
+        width: 48vw;
+        height: 58dvh;
+    }
+
+    #hulagwayBackdrop .backdrop-word--photo {
+        bottom: 0.5in;
+        right: 2vw;
+    }
+}
+
+
+/* Final alignment adjustment: tighter side margins and lilies lowered by 1 cm */
+#hulagwayBackdrop .backdrop-flower--left,
+#hulagwayBackdrop .backdrop-flower--right {
+    transform: translateY(1cm);
+}
+
+
+/* Final adjustment: move only the right lily slightly farther right. */
+#hulagwayBackdrop .backdrop-flower--right {
+    transform: translate(0.5cm, 1cm);
+}
+
