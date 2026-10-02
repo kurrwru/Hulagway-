@@ -6,3 +6,5 @@ to change
 -background 
 -centering
 -font
+
+manus ai
