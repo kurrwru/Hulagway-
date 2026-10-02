@@ -1,208 +1,149 @@
-(function () {
-    "use strict";
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    /* Shared organic mouse morph-reveal for both lilies. */
-    const CFG = {
-        TRAIL_MAX_POINTS: 60,
-        TRAIL_HEAD_R: 140,
-        TRAIL_NOISE_AMP: 44,
-        TRAIL_BLOB_PTS: 24,
-        TRAIL_FADE_SPEED: 0.92,
-        TRAIL_SAMPLE_DIST: 8
-    };
+    <title>Hulagway</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
-    const flowers = Array.prototype.slice.call(document.querySelectorAll(".backdrop-flower"));
-    if (!flowers.length) return;
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Playfair+Display:ital,wght@0,900;1,400&family=Caveat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    <link rel="stylesheet" href="css/style1.css" />
+  </head>
 
-    const instances = flowers.map(function (flower) {
-        const frontLayer = flower.querySelector(".backdrop-flower__layer--front");
-        const revealLayer = flower.querySelector(".backdrop-flower__layer--reveal");
-        const frontCanvas = document.createElement("canvas");
-        const revealCanvas = document.createElement("canvas");
-        const frontCtx = frontCanvas.getContext("2d");
-        const revealCtx = revealCanvas.getContext("2d");
+  <body>
+    <main class="landing" id="landing">
+      <div class="page-corner top-left"></div>
+      <div class="page-corner top-right"></div>
+      <div class="page-corner bottom-left"></div>
+      <div class="page-corner bottom-right"></div>
 
-        return {
-            flower,
-            frontLayer,
-            revealLayer,
-            frontCanvas,
-            revealCanvas,
-            frontCtx,
-            revealCtx,
-            trail: [],
-            lastSample: null,
-            lastSize: "",
-            hovering: false,
-            headRadius: 0,
-            time: 0
-        };
-    });
+      <p class="tagline">step inside &amp; strike a pose</p>
 
-    let raf = 0;
+      <section class="cabinet-scene">
+        <div class="cabinet" id="cabinet">
+          <!-- Photo booth sign -->
+          <div class="sign">
+            <div class="sign-rail"></div>
 
-    function resizeInstance(instance) {
-        const rect = instance.flower.getBoundingClientRect();
-        const w = Math.max(1, Math.round(rect.width));
-        const h = Math.max(1, Math.round(rect.height));
-        const size = w + "x" + h;
-        if (size === instance.lastSize) return;
-        instance.lastSize = size;
-        instance.frontCanvas.width = w;
-        instance.frontCanvas.height = h;
-        instance.revealCanvas.width = w;
-        instance.revealCanvas.height = h;
-        instance.lastSample = null;
-    }
+            <div class="sign-tiles">
+              <span>P</span>
+              <span>H</span>
+              <span>O</span>
+              <span>T</span>
+              <span>O</span>
+              <span>B</span>
+              <span>O</span>
+              <span>O</span>
+              <span>T</span>
+              <span>H</span>
+            </div>
 
-    function resize() {
-        instances.forEach(resizeInstance);
-    }
+            <div class="sign-rail"></div>
+          </div>
 
-    function drawMorphBlob(ctx, cx, cy, r, t, seed) {
-        if (r < 2) return;
+          <!-- Main cabinet -->
+          <div class="cabinet-body">
+            <p class="cabinet-sub">
+              Take Your Own · 4 Different Poses
+            </p>
 
-        const pts = [];
-        for (let i = 0; i < CFG.TRAIL_BLOB_PTS; i++) {
-            const angle = (Math.PI * 2 * i) / CFG.TRAIL_BLOB_PTS;
-            const n1 = Math.sin(angle * 3 + t * 1.4 + seed) * 0.45;
-            const n2 = Math.sin(angle * 5 - t * 0.9 + seed * 2.3) * 0.30;
-            const n3 = Math.cos(angle * 2 + t * 1.8 + seed * 0.7) * 0.25;
-            const noise = (n1 + n2 + n3) * CFG.TRAIL_NOISE_AMP * (r / CFG.TRAIL_HEAD_R);
-            const rr = r + noise;
-            pts.push({
-                x: cx + Math.cos(angle) * rr,
-                y: cy + Math.sin(angle) * rr
-            });
-        }
+            <!-- Curtain entrance -->
+            <div class="entrance-frame">
+              <div class="pelmet">
+                <span></span>
+                <span></span>
+              </div>
 
-        ctx.beginPath();
-        for (let i = 0; i < pts.length; i++) {
-            const p = pts[i];
-            const n = pts[(i + 1) % pts.length];
-            const mx = (p.x + n.x) / 2;
-            const my = (p.y + n.y) / 2;
-            if (i === 0) ctx.moveTo(mx, my);
-            ctx.quadraticCurveTo(p.x, p.y, mx, my);
-        }
-        ctx.closePath();
-        ctx.fill();
-    }
+              <div class="entrance" id="entrance">
+                <div class="interior">
+                  <!-- The real Hulagway page. It is shown when the curtains open. -->
+                  <iframe
+                    class="page-preview"
+                    id="pagePreview"
+                    src="booth.html"
+                    title=""
+                    tabindex="-1"
+                    aria-hidden="true"
+                  ></iframe>
+                </div>
 
-    function drawInstance(instance) {
-        const w = instance.frontCanvas.width;
-        const h = instance.frontCanvas.height;
-        const fc = instance.frontCtx;
-        const rc = instance.revealCtx;
+                <div class="curtain curtain-left"></div>
+                <div class="curtain curtain-right"></div>
+                <div class="curtain-rod"></div>
+              </div>
+            </div>
 
-        fc.clearRect(0, 0, w, h);
-        rc.clearRect(0, 0, w, h);
+            <!-- Bottom cabinet section -->
+            <div class="cabinet-bottom">
+              <div class="placard">
+                <div class="placard-sub">
+                  Ready immediately for download
+                </div>
 
-        /* Front mask: white means visible, transparent means punched out. */
-        fc.save();
-        fc.globalCompositeOperation = "source-over";
-        fc.fillStyle = "#fff";
-        fc.fillRect(0, 0, w, h);
-        fc.globalCompositeOperation = "destination-out";
+                <div class="placard-main">
+                  <em>Forever memories made here</em>
+                </div>
+              </div>
 
-        /* Reveal mask: white exists only where the trail is drawn. */
-        rc.save();
-        rc.globalCompositeOperation = "source-over";
-        rc.fillStyle = "#fff";
+              <!-- Insert coin button -->
+              <button
+                class="coin-zone"
+                id="coinZone"
+                type="button"
+                aria-label="Insert coin"
+              >
+                <div class="coin-slot-wrap">
+                  <div class="coin-slot-housing">
+                    <div class="coin-slot"></div>
+                  </div>
 
-        instance.trail.forEach(function (p) {
-            fc.globalAlpha = p.alpha;
-            rc.globalAlpha = p.alpha;
-            drawMorphBlob(fc, p.x, p.y, p.r, instance.time, p.seed);
-            drawMorphBlob(rc, p.x, p.y, p.r, instance.time, p.seed);
-        });
+                  <div class="coin-drop" id="coinDrop"></div>
 
-        fc.restore();
-        rc.restore();
+                  <div class="coin-label">
+                    INSERT<br />
+                    COIN
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
 
-        const frontURL = "url(" + instance.frontCanvas.toDataURL("image/png") + ")";
-        const revealURL = "url(" + instance.revealCanvas.toDataURL("image/png") + ")";
-        instance.frontLayer.style.webkitMaskImage = frontURL;
-        instance.frontLayer.style.maskImage = frontURL;
-        instance.revealLayer.style.webkitMaskImage = revealURL;
-        instance.revealLayer.style.maskImage = revealURL;
-    }
+          <!-- Cabinet 3D sides -->
+          <div class="face-right"></div>
+          <div class="face-bottom"></div>
+        </div>
 
-    function inside(instance, x, y) {
-        const rect = instance.flower.getBoundingClientRect();
-        return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-    }
+        <div class="cabinet-shadow"></div>
 
-    function addSample(instance, clientX, clientY) {
-        const rect = instance.flower.getBoundingClientRect();
-        const localX = clientX - rect.left;
-        // The left lily is visually mirrored with scaleX(-1), so its mask
-        // coordinates must be mirrored too. This keeps the morph under the
-        // actual cursor position: right side -> right side, left -> left.
-        const x = instance.flower.classList.contains("backdrop-flower--left")
-            ? rect.width - localX
-            : localX;
-        const y = clientY - rect.top;
-        const sample = { x, y };
+        <!-- Start arrow -->
+        <div class="start-here">
+          <span>start here</span>
+          <div class="arrow">↙</div>
+        </div>
+      </section>
 
-        if (!instance.lastSample || Math.hypot(x - instance.lastSample.x, y - instance.lastSample.y) > CFG.TRAIL_SAMPLE_DIST) {
-            instance.trail.push({
-                x,
-                y,
-                r: instance.headRadius,
-                alpha: 1,
-                seed: Math.random() * 100
-            });
-            while (instance.trail.length > CFG.TRAIL_MAX_POINTS) instance.trail.shift();
-            instance.lastSample = sample;
-        }
-    }
+      <p class="hover-hint">
+        <span class="hint-arrow">↑</span>
+        <span class="desktop-hint">
+          hover the coin slot to peek inside
+        </span>
+        <span class="mobile-hint">
+          tap the coin slot to start
+        </span>
+      </p>
+    </main>
 
-    window.addEventListener("mousemove", function (event) {
-        instances.forEach(function (instance) {
-            instance.hovering = inside(instance, event.clientX, event.clientY);
-            if (instance.hovering) {
-                if (instance.headRadius > 5) addSample(instance, event.clientX, event.clientY);
-            } else {
-                instance.lastSample = null;
-            }
-        });
-    }, { passive: true });
+    <!-- Custom coin cursor -->
+    <div class="coin-cursor" id="coinCursor" aria-hidden="true">
+      <span>¢</span>
+    </div>
 
-    function clearHoverState() {
-        instances.forEach(function (instance) {
-            instance.hovering = false;
-            instance.lastSample = null;
-        });
-    }
-
-    window.addEventListener("mouseleave", clearHoverState);
-    window.addEventListener("blur", clearHoverState);
-
-    window.addEventListener("resize", resize, { passive: true });
-
-    function tick() {
-        instances.forEach(function (instance) {
-            const targetR = instance.hovering ? CFG.TRAIL_HEAD_R : 0;
-            const ease = instance.hovering ? 0.14 : 0.04;
-            instance.headRadius += (targetR - instance.headRadius) * ease;
-            instance.time += 0.016;
-
-            for (let i = instance.trail.length - 1; i >= 0; i--) {
-                const p = instance.trail[i];
-                p.alpha *= CFG.TRAIL_FADE_SPEED;
-                p.r *= 0.995;
-                if (p.alpha < 0.01) instance.trail.splice(i, 1);
-            }
-            drawInstance(instance);
-        });
-
-        raf = requestAnimationFrame(tick);
-    }
-
-    resize();
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(tick);
-})();
+    <script src="js/script.js"></script>
+  </body>
+</html>
