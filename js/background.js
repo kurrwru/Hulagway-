@@ -206,4 +206,3 @@
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(tick);
 })();
-
