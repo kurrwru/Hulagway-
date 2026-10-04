@@ -179,14 +179,6 @@ if (document.fonts && document.fonts.ready) {
   });
 }
 
-/*
-  Desktop:
-  Start when the mouse click over the coin slot.
-*/
-coinZone.addEventListener("click", insertCoin);
+is clicked or tapped.
 
-/*
-  Mobile and desktop:
-  Start when the coin slot is clicked or tapped.
-*/
 coinZone.addEventListener("click", insertCoin);
