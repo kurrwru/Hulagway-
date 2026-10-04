@@ -182,3 +182,5 @@ if (document.fonts && document.fonts.ready) {
 is clicked or tapped.
 
 coinZone.addEventListener("click", insertCoin);
+
+coinZone.addEventListener("click", insertCoin);
