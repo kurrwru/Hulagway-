@@ -73,11 +73,11 @@ body { background: transparent; }
 
 #homePage .lily-word__mask  { display: block; }
 /* balances the trailing letter-spacing so the word is optically centred */
-#homePage .lily-word__inner { display: inline-block; padding-left: 0.033708em; }
+#homePage .lily-word__inner { display: inline-block; padding-left: 0.04em; }
 
 #homePage .lily-word__white {
-    color: #ff00ea;
-    text-shadow: 0 .018em 0 rgba(60, 14, 25, 0.28);
+    color: #ffffff;
+    text-shadow: 0 .03em 0 rgba(60, 14, 25, 0.28);
 }
 
 
