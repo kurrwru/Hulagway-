@@ -825,3 +825,4 @@ document.querySelector("#downloadButton").onclick = function () {
     a.download = "hulagway-solo-photo.png";
     a.click();
 };
+
