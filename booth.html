@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Hulagway</title>
     <meta name="description" content="Your little online photobooth.">
     <meta name="theme-color" content="#c45c74">
@@ -11,69 +11,50 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Great+Vibes&family=Nunito:wght@400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-    <!-- Pastel lily backdrop: decorative layer for the photobooth pages. -->
-    <div id="hulagwayBackdrop" aria-hidden="true">
-        <div class="backdrop-checker"></div>
-        <div class="backdrop-glow backdrop-glow--one"></div>
-        <div class="backdrop-glow backdrop-glow--two"></div>
+    <div id="homePage" class="poster anim">
+        <div class="stage" id="stage">
+            <h1 class="lily-word" id="lily-title" aria-label="Hulagway">
+                <span class="lily-word__mask">
+                    <span class="lily-word__inner">
+                        <span class="lily-word__white"><span class="lily-word__o">HULAGWAY</span>
+                    </span>
+                </span>
+            </h1>
 
-        <div class="backdrop-brand">HULAGWAY</div>
-
-        <div class="backdrop-copy backdrop-copy--left">little moments,<br>made to keep.</div>
-        <div class="backdrop-copy backdrop-copy--right">click and move<br>to reveal a little magic.</div>
-
-        <div class="backdrop-word backdrop-word--photo">PHOTOBOOTH</div>
-
-        <div class="backdrop-flower backdrop-flower--left" data-flower="left">
-            <div class="backdrop-flower__layer backdrop-flower__layer--front">
-                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="">
+            <div class="flower" id="flower">
+                <img class="flower__sizer" src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="" aria-hidden="true">
+                <div class="flower__layer flower__layer--bg" id="flowerBg">
+                    <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="Pixel-art pink and violet lily">
+                </div>
+                <div class="flower__layer flower__layer--top" id="flowerTop" aria-hidden="true">
+                    <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_151324_bf318a5f-5525-4fc7-aab5-e9a341018828.png&w=1280&q=85" alt="">
+                </div>
             </div>
-            <div class="backdrop-flower__layer backdrop-flower__layer--reveal">
-                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_151324_bf318a5f-5525-4fc7-aab5-e9a341018828.png&w=1280&q=85" alt="">
+            <div class="photos" aria-hidden="true">
+                <div class="photo photo--grid"><img src="img/strip-grid-lavender.jpg" alt=""></div>
+                <div class="photo photo--hearts"><img src="img/strip-hearts.jpg" alt=""></div>
+                <div class="photo photo--film"><img src="img/strip-film.jpg" alt=""></div>
+                <div class="photo photo--pizza"><img src="img/polaroid-pizza.jpg" alt=""></div>
             </div>
+            <p class="support-copy support-copy--left"><span class="support-copy__inner">Your little,<br>online photobooth.</span></p>
+            <p class="support-copy support-copy--right"><span class="support-copy__inner">Strike a pose.<br>Keep the memory.</span></p>
+
+            <div class="dock">
+                <button id="startButton" class="btn primary glass" type="button">Start</button>
+                <footer class="home-footer">
+                    <button type="button" id="privacyLink" class="text-link glass">Privacy</button>
+                    <button type="button" id="howLink" class="btn secondary glass how-btn">How to use</button>
+                    <button type="button" id="aboutLink" class="text-link glass">About</button>
+                </footer>
+            </div>
+
         </div>
-
-        <div class="backdrop-flower backdrop-flower--right" data-flower="right">
-            <div class="backdrop-flower__layer backdrop-flower__layer--front">
-                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_192942_e1086505-d7da-433b-a59b-8220f4e6c808.png&w=1280&q=85" alt="">
-            </div>
-            <div class="backdrop-flower__layer backdrop-flower__layer--reveal">
-                <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260808_151324_bf318a5f-5525-4fc7-aab5-e9a341018828.png&w=1280&q=85" alt="">
-            </div>
-        </div>
-    </div>
-
-    <div id="homePage" class="page">
-        <p class="eyebrow">Solo mode</p>
-        <h1>Hulagway</h1>
-        <p class="tagline">Your little online photobooth.</p>
-        <button id="startButton" class="btn primary">Start</button>
-
-        <ol class="steps">
-            <li>
-                <strong>Pick a layout</strong>
-                <span>Strip, grid, polaroid, or film.</span>
-            </li>
-            <li>
-                <strong>Take photos</strong>
-                <span>A 3-second countdown for each slot.</span>
-            </li>
-            <li>
-                <strong>Make it yours</strong>
-                <span>Color, pattern, caption, then download.</span>
-            </li>
-        </ol>
-
-        <footer class="home-footer">
-            <button type="button" id="aboutLink" class="text-link">About</button>
-            <button type="button" id="privacyLink" class="text-link">Privacy</button>
-        </footer>
     </div>
 
     <div id="soloPage" class="page hidden">
-        <p class="eyebrow">Solo mode</p>
         <h1>Choose your layout</h1>
         <div class="layout-grid">
             <button type="button" class="layout-card" id="classicButton" data-layout="classic">
@@ -97,7 +78,7 @@
                 <span class="layout-meta">1 × 2 · 2 photos</span>
             </button>
         </div>
-        <button type="button" id="backButton" class="btn ghost">Back</button>
+        <button type="button" id="backButton" class="text-link glass">Back</button>
     </div>
 
     <div id="capturePage" class="page hidden">
@@ -160,7 +141,6 @@
     </div>
 
     <div id="finalPage" class="page hidden">
-        <p class="eyebrow">Your Hulagway photo</p>
         <h1>Ready to keep</h1>
         <img id="finalImage" alt="Finished Hulagway photobooth">
         <div class="actions">
@@ -169,6 +149,26 @@
             <button type="button" id="againButton" class="btn ghost">Again</button>
         </div>
         <button type="button" id="finalHomeButton" class="text-link">Home</button>
+    </div>
+
+    <div id="howPage" class="page hidden info-page">
+        <p class="eyebrow">Hulagway</p>
+        <h1>How to use</h1>
+        <ol class="steps">
+            <li>
+                <strong>Pick a layout</strong>
+                <span>Strip, grid, polaroid, or film.</span>
+            </li>
+            <li>
+                <strong>Take photos</strong>
+                <span>A 3-second countdown for each slot.</span>
+            </li>
+            <li>
+                <strong>Make it yours</strong>
+                <span>Color, pattern, caption, then download.</span>
+            </li>
+        </ol>
+        <button type="button" class="btn ghost info-back">Back to Hulagway</button>
     </div>
 
     <div id="aboutPage" class="page hidden info-page">
@@ -189,7 +189,7 @@
         <button type="button" class="btn ghost info-back">Back to Hulagway</button>
     </div>
 
-    <script src="js/background.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/home.js"></script>
 </body>
 </html>
